@@ -298,7 +298,11 @@ def custom_appliance_submission_form():
                 save_pending_submissions(st.session_state.pending_submissions)
                 
                 st.success("✅ Appliance submitted for review! We'll evaluate it before adding to the database.")
-                st.session_state.show_submission_form = False
+                if st.session_state.get("submitted_success", False):    
+                    if st.button("← Back to Calculator"):
+                        st.session_state.show_submission_form = False
+                        st.session_state.inputs_visible = True
+                        st.rerun()
 
 def edit_custom_appliance():
     st.markdown("---")
