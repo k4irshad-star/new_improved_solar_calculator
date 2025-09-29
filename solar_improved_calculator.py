@@ -363,8 +363,8 @@ if not st.session_state.pending_submissions:
 
 # Appliance options - combine default and custom appliances
 default_appliances = [
-    {"name": "Flour Grinding Hammer Mill 2kW", "power_ac": 2.0, "power_dc": 2.0, "processing_speed": 100, "price_usd": 600},
-    {"name": "Flour Grinding Hammer Mill 3kW", "power_ac": 3.0, "power_dc": 3.0, "processing_speed": 150, "price_usd": 700},
+    {"name": "Grade 2 Flour Grinding Hammer Mill 2kW", "power_ac": 2.0, "power_dc": 2.0, "processing_speed": 100, "price_usd": 600},
+    {"name": "Grade 1 Flour Grinding Hammer Mill 3kW", "power_ac": 3.0, "power_dc": 3.0, "processing_speed": 150, "price_usd": 700},
     {"name": "Posho Mill", "power_ac": 2.2, "power_dc": 1.3, "processing_speed": 100, "price_usd": 600},
     {"name": "Rice Mill", "power_ac": 1.8, "power_dc": 1.3, "processing_speed": 60, "price_usd": 600},
 ]
@@ -575,7 +575,7 @@ if st.session_state.inputs_visible:
                         https://productivesolarsolutions.com)
                         """)
 
-            elif selected_appliance == "Flour Grinding Hammer Mill 2kW":
+            elif selected_appliance == "Grade 2 Flour Grinding Hammer Mill 2kW":
                 st.markdown("---")
                 
                 
@@ -612,7 +612,7 @@ if st.session_state.inputs_visible:
 
 
 
-            elif selected_appliance == "Flour Grinding Hammer Mill 3kW":
+            elif selected_appliance == "Grade 1 Flour Grinding Hammer Mill 3kW":
                 st.markdown("---")
                 
                 
@@ -625,12 +625,12 @@ if st.session_state.inputs_visible:
                             <div style="text-align: center; padding: 15px;">
                                 <a href="https://productivesolarsolutions.com/uploads/spec/MaizeMill(PoshoMillGrade%202).pdf" 
                                 target="_blank">
-                                    <img src="https://productivesolarsolutions.com/uploads/products/MaizeMill.png" 
+                                    <img src="https://www.villageinfrastructure.com/wp-content/uploads/2025/09/new.png" 
                                         style="max-height: 180px; width: auto; border-radius: 8px; 
                                                 border: 1px solid #e0e0e0; padding: 5px;">
                                 </a>
                                 <div style="margin-top: 8px; font-style: italic; color: #555; font-size: 14px;">
-                                    Maize Mill(Posho Mill Grade 2)
+                                    Hammer Mill & Rice Huller
                                 </div>
                             </div>
                             """, 
@@ -641,7 +641,9 @@ if st.session_state.inputs_visible:
                         
                         st.markdown("""
                         
-                        - [Technical Spec Sheet (PDF)](
+                        - [Technical Spec Sheet Hammer Mill(PDF)](
+                        https://productivesolarsolutions.com/uploads/spec/MaizeMill(PoshoMillGrade%202).pdf)
+                        - [Technical Spec Sheet Rice Mill (PDF)](
                         https://productivesolarsolutions.com/uploads/spec/MaizeMill(PoshoMillGrade%202).pdf)
                         - [Product Website](
                         https://productivesolarsolutions.com)
