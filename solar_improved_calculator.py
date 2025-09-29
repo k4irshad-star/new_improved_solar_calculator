@@ -540,6 +540,79 @@ if st.session_state.inputs_visible:
                     price_usd = price_map_usd[selected_appliance]
                     processing_speed = processing_speed_map[selected_appliance]
 
+            if selected_appliance == "Posho Mill":
+                st.markdown("---")
+                
+                
+                # Create a clean container for the image section
+                with st.container():
+                    
+                        # Image with centered alignment and clean styling
+                        st.markdown(
+                            """
+                            <div style="text-align: center; padding: 15px;">
+                                <a href="https://productivesolarsolutions.com/uploads/spec/MaizeMill(PoshoMillGrade%202).pdf" 
+                                target="_blank">
+                                    <img src="https://productivesolarsolutions.com/uploads/products/MaizeMill.png" 
+                                        style="max-height: 180px; width: auto; border-radius: 8px; 
+                                                border: 1px solid #e0e0e0; padding: 5px;">
+                                </a>
+                                <div style="margin-top: 8px; font-style: italic; color: #555; font-size: 14px;">
+                                    Maize Mill(Posho Mill Grade 2)
+                                </div>
+                            </div>
+                            """, 
+                            unsafe_allow_html=True
+                        ) #col2
+                        
+
+                        
+                        st.markdown("""
+                        
+                        - [Technical Spec Sheet (PDF)](
+                        https://productivesolarsolutions.com/uploads/spec/MaizeMill(PoshoMillGrade%202).pdf)
+                        - [Product Website](
+                        https://productivesolarsolutions.com)
+                        """)
+
+            elif selected_appliance == "Rice Mill":
+                st.markdown("---")
+
+                
+                # Create a clean container for the image section
+                with st.container():
+                    
+                    
+                    
+                        # Image with centered alignment and clean styling
+                        st.markdown(
+                            """
+                            <div style="text-align: center; padding: 15px;">
+                                <a href="https://productivesolarsolutions.com/uploads/spec/MaizeMill(PoshoMillGrade%202).pdf" 
+                                target="_blank">
+                                    <img src="https://productivesolarsolutions.com/uploads/products/RiceMill-MaizeHuller.png" 
+                                        style="max-height: 180px; width: auto; border-radius: 8px; 
+                                                border: 1px solid #e0e0e0; padding: 5px;">
+                                </a>
+                                <div style="margin-top: 8px; font-style: italic; color: #555; font-size: 14px;">
+                                    Rice Mill - Maize Huller
+                                </div>
+                            </div>
+                            """, 
+                            unsafe_allow_html=True
+                        )
+                        
+                
+                        
+                        st.markdown("""
+                        
+                        - [Technical Spec Sheet (PDF)](
+                        https://productivesolarsolutions.com/uploads/spec/MaizeMill(PoshoMillGrade%202).pdf)
+                        - [Product Website](
+                        https://productivesolarsolutions.com)
+                        """)     
+
+            
 
             runtime_per_day = st.slider(
                 "Runtime Per Day (hrs)", 
