@@ -714,7 +714,7 @@ if st.session_state.inputs_visible:
             install_increase = st.slider(
                 "Import & Installation Cost Increase (%)", 
                 min_value=0, 
-                max_value=100,
+                max_value=500,
                 value=100, 
                 step=10,
                 help="Additional percentage cost for importing and installation"
