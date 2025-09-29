@@ -1602,7 +1602,7 @@ if not st.session_state.inputs_visible and st.session_state.get("calculated", Fa
         fig = go.Figure()
 
         # Finance remaining as bars
-                finance_colors = []
+        finance_colors = []
         for finance in remaining_finance:
             if finance >= 0:  # After break-even
                 finance_colors.append("green")
