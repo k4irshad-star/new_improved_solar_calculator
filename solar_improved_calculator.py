@@ -575,6 +575,78 @@ if st.session_state.inputs_visible:
                         https://productivesolarsolutions.com)
                         """)
 
+            elif selected_appliance == "Flour Grinding Hammer Mill 2kW":
+                st.markdown("---")
+                
+                
+                # Create a clean container for the image section
+                with st.container():
+                    
+                        # Image with centered alignment and clean styling
+                        st.markdown(
+                            """
+                            <div style="text-align: center; padding: 15px;">
+                                <a href="https://productivesolarsolutions.com/uploads/spec/MaizeMill(PoshoMillGrade%202).pdf" 
+                                target="_blank">
+                                    <img src="https://productivesolarsolutions.com/uploads/products/MaizeMill.png" 
+                                        style="max-height: 180px; width: auto; border-radius: 8px; 
+                                                border: 1px solid #e0e0e0; padding: 5px;">
+                                </a>
+                                <div style="margin-top: 8px; font-style: italic; color: #555; font-size: 14px;">
+                                    Maize Mill(Posho Mill Grade 2)
+                                </div>
+                            </div>
+                            """, 
+                            unsafe_allow_html=True
+                        ) #col2
+                        
+
+                        
+                        st.markdown("""
+                        
+                        - [Technical Spec Sheet (PDF)](
+                        https://productivesolarsolutions.com/uploads/spec/MaizeMill(PoshoMillGrade%202).pdf)
+                        - [Product Website](
+                        https://productivesolarsolutions.com)
+                        """)
+
+
+
+            elif selected_appliance == "Flour Grinding Hammer Mill 3kW":
+                st.markdown("---")
+                
+                
+                # Create a clean container for the image section
+                with st.container():
+                    
+                        # Image with centered alignment and clean styling
+                        st.markdown(
+                            """
+                            <div style="text-align: center; padding: 15px;">
+                                <a href="https://productivesolarsolutions.com/uploads/spec/MaizeMill(PoshoMillGrade%202).pdf" 
+                                target="_blank">
+                                    <img src="https://productivesolarsolutions.com/uploads/products/MaizeMill.png" 
+                                        style="max-height: 180px; width: auto; border-radius: 8px; 
+                                                border: 1px solid #e0e0e0; padding: 5px;">
+                                </a>
+                                <div style="margin-top: 8px; font-style: italic; color: #555; font-size: 14px;">
+                                    Maize Mill(Posho Mill Grade 2)
+                                </div>
+                            </div>
+                            """, 
+                            unsafe_allow_html=True
+                        ) #col2
+                        
+
+                        
+                        st.markdown("""
+                        
+                        - [Technical Spec Sheet (PDF)](
+                        https://productivesolarsolutions.com/uploads/spec/MaizeMill(PoshoMillGrade%202).pdf)
+                        - [Product Website](
+                        https://productivesolarsolutions.com)
+                        """) 
+            
             elif selected_appliance == "Rice Mill":
                 st.markdown("---")
 
