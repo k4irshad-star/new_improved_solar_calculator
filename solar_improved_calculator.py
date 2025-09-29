@@ -1602,11 +1602,19 @@ if not st.session_state.inputs_visible and st.session_state.get("calculated", Fa
         fig = go.Figure()
 
         # Finance remaining as bars
+                finance_colors = []
+        for finance in remaining_finance:
+            if finance >= 0:  # After break-even
+                finance_colors.append("green")
+            else:  # Before break-even
+                finance_colors.append("red")
+
+        # Finance remaining as bars with conditional coloring
         fig.add_trace(go.Bar(
             x=years, 
             y=remaining_finance, 
             name="Finance Remaining",
-            marker_color="red",
+            marker_color=finance_colors,  # Now it's an array of colors
             opacity=0.7,
             hovertemplate="Year: %{x:.1f}<br>Remaining: %{y:,.0f}"
         ))
