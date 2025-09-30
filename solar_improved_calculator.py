@@ -775,11 +775,7 @@ if st.session_state.inputs_visible:
 
         # Currency selection
         st.markdown('<div class="section-title">Currency Settings</div>', unsafe_allow_html=True)
-        use_location = st.checkbox(
-            "Use my location to set currency automatically", 
-            value=False,
-            help="Automatically detect your country and currency"
-        )
+        use_location = False
 
         # Get the current selected currency from session state
         selected_currency = st.session_state.selected_currency
