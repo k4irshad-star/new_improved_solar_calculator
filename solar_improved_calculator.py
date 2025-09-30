@@ -363,10 +363,10 @@ if not st.session_state.pending_submissions:
 
 # Appliance options - combine default and custom appliances
 default_appliances = [
-    {"name": "Grade 2 Flour Grinding Hammer Mill 2kW", "power_ac": 2.0, "power_dc": 2.0, "processing_speed": 100, "price_usd": 600},
+    {"name": "Hammer Mill for Flour", "power_ac": 2.0, "power_dc": 2.0, "processing_speed": 100, "price_usd": 600},
     #{"name": "Grade 1 Flour Grinding Hammer Mill 3kW", "power_ac": 3.0, "power_dc": 3.0, "processing_speed": 150, "price_usd": 700},
     
-    {"name": "Rice Mill", "power_ac": 1.8, "power_dc": 1.3, "processing_speed": 60, "price_usd": 600},
+    {"name": "Rice Huller/Polisher", "power_ac": 1.8, "power_dc": 1.3, "processing_speed": 60, "price_usd": 600},
 ]
 custom_appliance_names = [app["name"] for app in st.session_state.custom_appliances]
 # Appliance options - combine default and custom appliances
@@ -542,7 +542,7 @@ if st.session_state.inputs_visible:
 
             
 
-            if selected_appliance == "Grade 2 Flour Grinding Hammer Mill 2kW":
+            if selected_appliance == "Hammer Mill for Flour":
                 st.markdown("---")
                 
                 
@@ -610,13 +610,13 @@ if st.session_state.inputs_visible:
                         
                         - [Technical Spec Sheet Hammer Mill(PDF)](
                         https://productivesolarsolutions.com/uploads/spec/MaizeMill(PoshoMillGrade%202).pdf)
-                        - [Technical Spec Sheet Rice Mill (PDF)](
+                        - [Technical Spec Sheet Rice Huller/Polisher (PDF)](
                         https://productivesolarsolutions.com/uploads/spec/MaizeMill(PoshoMillGrade%202).pdf)
                         - [Product Website](
                         https://productivesolarsolutions.com)
                         """) 
             
-            elif selected_appliance == "Rice Mill":
+            elif selected_appliance == "Rice Huller/Polisher":
                 st.markdown("---")
 
                 
@@ -1008,7 +1008,7 @@ if not st.session_state.inputs_visible and st.session_state.get("calculated", Fa
         """, unsafe_allow_html=True)
 
         # --- Organized Image + Tech Spec Link for Maize Mill ---
-        if selected_appliance == "Posho Mill":
+        if selected_appliance == "Hammer Mill for Flour":
             st.markdown("---")
             st.subheader("Technical Specifications")
             
@@ -1072,7 +1072,7 @@ if not st.session_state.inputs_visible and st.session_state.get("calculated", Fa
             st.caption("Click the image or links above to view detailed technical specifications")
 
         # --- Organized Image + Tech Spec Link for Rice Mill ---
-        elif selected_appliance == "Rice Mill":
+        elif selected_appliance == "Rice Huller/Polisher":
             st.markdown("---")
             st.subheader("Technical Specifications")
             
