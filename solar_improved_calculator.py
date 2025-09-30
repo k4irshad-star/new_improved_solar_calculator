@@ -560,7 +560,7 @@ if st.session_state.inputs_visible:
                                                 border: 1px solid #e0e0e0; padding: 5px;">
                                 </a>
                                 <div style="margin-top: 8px; font-style: italic; color: #555; font-size: 14px;">
-                                    Maize Mill(Posho Mill Grade 2)
+                                    Maize Mill(Posho Mill Grade 2) <br> Can make Grade 2 wholegrain flour from maize and other grains, or Grade 1 maize flour from hulled maize, or coarsely ground animal feed.
                                 </div>
                             </div>
                             """, 
@@ -636,7 +636,7 @@ if st.session_state.inputs_visible:
                                                 border: 1px solid #e0e0e0; padding: 5px;">
                                 </a>
                                 <div style="margin-top: 8px; font-style: italic; color: #555; font-size: 14px;">
-                                    Rice Mill - Maize Huller
+                                    Rice Mill - Maize Huller <br> Hulls and polishes rice to various levels of whiteness. Can also hull maize for making Grade 1 flour when combined with a hammer mill.
                                 </div>
                             </div>
                             """, 
