@@ -476,6 +476,39 @@ if st.session_state.inputs_visible:
         col1, col2 = st.columns(2)
 
         with col1:
+            # Currency selection
+        
+            st.markdown('<div class="section-title">Currency Settings</div>', unsafe_allow_html=True)
+            #use_location = st.checkbox(
+            use_location = False
+
+            # Get the current selected currency from session state
+            selected_currency = st.session_state.selected_currency
+            
+            if use_location:
+                user_country, detected_currency = get_user_currency()
+                if detected_currency in currencies:
+                    selected_currency = detected_currency
+                    st.success(f"Detected location: {user_country} - Using {detected_currency}")
+                else:
+                    st.warning(f"Detected currency {detected_currency} not supported. Using USD instead.")
+                    selected_currency = "USD"
+            else:
+                # Set the index to USD by finding its position in the currencies list
+                usd_index = currencies.index("USD") if "USD" in currencies else 0
+                selected_currency = st.selectbox(
+                    "Select Currency:", 
+                    currencies,
+                    index=usd_index
+                )
+            
+            # Update the session state with the selected currency
+            st.session_state.selected_currency = selected_currency
+
+            st.markdown('<div class="section-title">Appliance Details</div>', unsafe_allow_html=True)
+            #new changes added above
+
+            
             st.markdown('<div class="section-title">Appliance Details</div>', unsafe_allow_html=True)
             
             # Choice: from database or manual entry
@@ -672,14 +705,33 @@ if st.session_state.inputs_visible:
                 help="Number of days per year the business will operate"
             )
             
-            income_per_kg = st.number_input(
-                "Income per kg (USD)", 
-                min_value=0.0, 
-                value=round(5/140, 3),
-                step=0.001,
-                format="%.3f",
-                help="Revenue generated per kg of processed material"
-            )
+            #input selection
+            if selected_currency == "USD":
+                income_per_kg = st.number_input(
+                    "Income per kg (USD)", 
+                    min_value=0.0, 
+                    value=round(5/140, 3),
+                    step=0.001,
+                    format="%.3f",
+                    help="Revenue generated per kg of processed material"
+                )
+                income_per_kg_usd = income_per_kg  # Already in USD
+            else:
+                # Income per kg in selected currency
+                income_per_kg_local = st.number_input(
+                    f"Income per kg ({selected_currency})", 
+                    min_value=0.0, 
+                    value=round((5/140) * rates.get(selected_currency, 1.0), 3),  # Convert default value
+                    step=0.001,
+                    format="%.3f",
+                    help=f"Revenue generated per kg of processed material in {selected_currency}"
+                )
+                # Convert back to USD for calculations
+                exchange_rate = rates.get(selected_currency, 1.0)
+                income_per_kg_usd = income_per_kg_local / exchange_rate
+
+            # Use the USD value for calculations
+            income_per_kg = income_per_kg_usd
 
         with col2:
             st.markdown('<div class="section-title">Solar System Details</div>', unsafe_allow_html=True)
@@ -709,12 +761,28 @@ if st.session_state.inputs_visible:
                 help="Hours of battery backup required"
             )
             
-            daily_operating_cost = st.number_input(
-                "Daily Operating Cost (USD)", 
-                value=10.0, 
-                step=1.0,
-                help="Daily expenses like labor, rent, etc."
-            )
+            if selected_currency == "USD":
+                daily_operating_cost = st.number_input(
+                    "Daily Operating Cost (USD)", 
+                    value=10.0, 
+                    step=1.0,
+                    help="Daily expenses like labor, rent, etc."
+                )
+                daily_operating_cost_usd = daily_operating_cost  # Already in USD
+            else:
+                # Daily operating cost in selected currency
+                daily_operating_cost_local = st.number_input(
+                    f"Daily Operating Cost ({selected_currency})", 
+                    value=10.0 * rates.get(selected_currency, 1.0),  # Convert default value
+                    step=1.0,
+                    help=f"Daily expenses like labor, rent, etc. in {selected_currency}"
+                )
+                # Convert back to USD for calculations
+                exchange_rate = rates.get(selected_currency, 1.0)
+                daily_operating_cost_usd = daily_operating_cost_local / exchange_rate
+
+            # Use the USD value for calculations
+            daily_operating_cost = daily_operating_cost_usd
 
         # Financial inputs
         st.markdown('<div class="section-title">Financing Options</div>', unsafe_allow_html=True)
