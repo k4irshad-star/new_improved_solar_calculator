@@ -506,6 +506,14 @@ if st.session_state.inputs_visible:
             st.session_state.selected_currency = selected_currency
 
             st.markdown('<div class="section-title">Appliance Details</div>', unsafe_allow_html=True)
+
+            rate_new = rates.get(selected_currency, 1)
+            if selected_currency != "USD":
+                if rates == common_currencies:
+                    st.warning(f"⚠️ Using sample exchange rates (1 USD = {rate_new:.2f} {selected_currency}). For accurate results, please verify current rates.")
+                else:
+                    st.caption(f"💱 Exchange rate used: 1 USD = {rate_new:.2f} {selected_currency}")
+
             #new changes added above
 
             
