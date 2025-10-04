@@ -841,32 +841,7 @@ if st.session_state.inputs_visible:
             help="Percentage of the total installed cost covered by subsidies"
         )
 
-        # Currency selection
-        st.markdown('<div class="section-title">Currency Settings</div>', unsafe_allow_html=True)
-        use_location = False
-
-        # Get the current selected currency from session state
-        selected_currency = st.session_state.selected_currency
         
-        if use_location:
-            user_country, detected_currency = get_user_currency()
-            if detected_currency in currencies:
-                selected_currency = detected_currency
-                st.success(f"Detected location: {user_country} - Using {detected_currency}")
-            else:
-                st.warning(f"Detected currency {detected_currency} not supported. Using USD instead.")
-                selected_currency = "USD"
-        else:
-            # Set the index to USD by finding its position in the currencies list
-            usd_index = currencies.index("USD") if "USD" in currencies else 0
-            selected_currency = st.selectbox(
-                "Select Currency:", 
-                currencies,
-                index=usd_index
-            )
-        
-        # Update the session state with the selected currency
-        st.session_state.selected_currency = selected_currency
 
     calculate_btn = st.button(
         "🚀 Calculate System Requirements", 
