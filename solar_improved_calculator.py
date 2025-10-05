@@ -1005,7 +1005,7 @@ if not st.session_state.inputs_visible and st.session_state.get("calculated", Fa
         viability_class = "error-box"
 
     # Display results in tabs
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 Overview", "💵 Financials", "⚡ Technical", "📈 Viability", "📊Chart"])
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["📊 Overview", "💵 Financials", "⚡ Technical", "📈 Viability", "📊Chart", "Export Report"])
 
     with tab1:
         st.subheader("Key Metrics")
@@ -1741,7 +1741,779 @@ if not st.session_state.inputs_visible and st.session_state.get("calculated", Fa
         st.subheader("Key Milestones")
         st.dataframe(pd.DataFrame(milestone_data), hide_index=True, use_container_width=True)
         
+    with tab6:
+        st.divider()
+        st.subheader("📊 Comprehensive Export Report")
+        install_increase = (install_multiplier - 1) * 100
+        # Payback calculation
+        payback_years_new = total_after_subsidy / (net_income_per_day * operating_days) if net_income_per_day > 0 else float('inf')
+        
+        # Create comprehensive report data with ALL inputs and outputs
+        report_data = {
+            # Project Info
+            "Project": "Solar Productive Use Analysis",
+            "Date": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "Currency": selected_currency,
+            "Exchange Rate": f"1 USD = {rate:.2f} {selected_currency}",
+            
+            # INPUTS - Appliance Details
+            "Appliance": selected_appliance,
+            "System Type": selected_system,
+            "Power Consumption": f"{power} kW",
+            "Processing Speed": f"{processing_speed} kg/hour",
+            "Appliance Price": f"${price_usd} USD",
+            "Daily Runtime": f"{runtime_per_day} hours",
+            "Operating Days/Year": operating_days,
+            
+            # INPUTS - Solar System
+            "Sun Hours/Day": f"{sun_hours} hours",
+            "System Efficiency": f"{system_efficiency}%",
+            "Battery Storage": f"{battery_hours} hours",
+            
+            # INPUTS - Financial
+            "Income per kg": f"{selected_currency} {round(income_per_kg * rate, 3)}",
+            "Daily Operating Cost": f"{selected_currency} {round(daily_operating_cost * rate, 1)}",
+            "Loan Term": f"{loan_term_years} years",
+            "Interest Rate": f"{interest_rate * 100}%",
+            "Deposit Percentage": f"{deposit_percentage}%",
+            "Import/Installation Cost Increase": f"{install_increase}%",
+            "Subsidy Percentage": f"{subsidy_percentage}%",
+            
+            # OUTPUTS - Technical Specifications
+            "Recommended Solar Size": f"{recommended_solar_size} kWp",
+            "Panels Required": panels_required,
+            "Battery Capacity": f"{battery_capacity} kWh",
+            "Daily Energy Required": f"{round(energy_required_per_day, 1)} kWh",
+            "Daily Energy Production": f"{round(energy_production, 1)} kWh",
+            "Specific Efficiency": f"{round(specific_efficiency, 2)} kg/kWh",
+            
+            # OUTPUTS - Production & Income
+            "Daily Production": f"{round(production_per_day, 1)} kg",
+            "Daily Gross Income": f"{selected_currency} {round(income_per_day * rate, 1)}",
+            "Daily Net Income": f"{selected_currency} {round(net_income_per_day * rate, 1)}",
+            "Annual Gross Income": f"{selected_currency} {round(gross_income_per_year * rate, 1)}",
+            "Annual Net Profit": f"{selected_currency} {round(net_income_per_day * operating_days * rate, 1)}",
+            
+            # OUTPUTS - Cost Breakdown (in selected currency)
+            "Machine Cost": f"{selected_currency} {round(price_usd * rate, 1)}",
+            "Solar Panel Cost": f"{selected_currency} {round(solar_panel_cost * rate, 1)}",
+            "Battery Cost": f"{selected_currency} {round(battery_cost * rate, 1)}",
+            "Inverter/Controller Cost": f"{selected_currency} {round((inverter_cost + controller_cost) * rate, 1)}",
+            "Import & Installation Cost": f"{selected_currency} {round((fob_subtotal_usd * (install_multiplier - 1)) * rate, 1)}",
+            "FOB Subtotal": f"{selected_currency} {round(fob_subtotal_usd * rate, 1)}",
+            "Total Installed Cost": f"{selected_currency} {round(total_with_import_usd * rate, 1)}",
+            "Subsidy Amount": f"{selected_currency} {round(subsidy_amount * rate, 1)}",
+            "Total After Subsidy": f"{selected_currency} {round(total_after_subsidy * rate, 1)}",
+            "Deposit Amount": f"{selected_currency} {round(deposit_amount * rate, 1)}",
+            "Loan Amount": f"{selected_currency} {round(loan_principal_usd * rate, 1)}",
+            
+            # OUTPUTS - Loan Details
+            "Monthly Repayment": f"{selected_currency} {round(monthly_repayment_usd * rate, 1)}",
+            "Annual Repayment": f"{selected_currency} {round(annual_repayment_usd * rate, 1)}",
+            "Daily Repayment": f"{selected_currency} {round(daily_repayment_usd * rate, 1)}",
+            "Total Interest Paid": f"{selected_currency} {round(total_interest_paid_usd * rate, 1)}",
+            "Total Repayment Amount": f"{selected_currency} {round(total_repayment_usd * rate, 1)}",
+            
+            # OUTPUTS - Financial Analysis
+            "Repayment % of Gross Revenue": f"{round(repayment_percentage, 1)}%",
+            "Repayment % of Net Revenue": f"{round(net_revenue_repayment_percentage, 1)}%",
+            "Payback Period": f"{round(payback_years_new, 1)} years" if viable_business else "N/A",
+            "Business Viable": viability_text,
+            "Daily Surplus": f"{selected_currency} {round((net_income_per_day - daily_repayment_usd) * rate, 1)}" if viable_business and net_income_per_day > daily_repayment_usd else f"{selected_currency} 0"
+        }
+        
+        # --- Key Performance Indicators ---
+        st.subheader("🎯 Key Performance Indicators")
+        
+        kpi_col1, kpi_col2, kpi_col3, kpi_col4 = st.columns(4)
+        
+        with kpi_col1:
+            st.metric(
+                "💰 Daily Net Income", 
+                f"{selected_currency} {round(net_income_per_day * rate, 1)}",
+                f"{selected_currency} {round((net_income_per_day - daily_repayment_usd) * rate, 1)} after loan"
+            )
+        
+        with kpi_col2:
+            st.metric(
+                "🏗️ Total Investment", 
+                f"{selected_currency} {round(total_after_subsidy * rate, 1)}",
+                f"After {subsidy_percentage}% subsidy"
+            )
+        
+        with kpi_col3:
+            st.metric(
+                "⏳ Payback Period", 
+                f"{round(payback_years_new, 1)} years" if viable_business else "N/A",
+                "Time to recover investment"
+            )
+        
+        with kpi_col4:
+            st.metric(
+                "📈 Business Viability", 
+                viability_text,
+                "Based on cash flow analysis"
+            )
+        
+        # --- Detailed Report Table ---
+        st.divider()
+        st.subheader("📋 Complete Analysis Report")
+        
+        # Convert to DataFrame for better display
+        report_df = pd.DataFrame(list(report_data.items()), columns=["Parameter", "Value"])
+        
+        # Display in an expandable table
+        with st.expander("📊 View Complete Report Data", expanded=True):
+            st.dataframe(
+                report_df,
+                hide_index=True,
+                use_container_width=True,
+                height=600
+            )
+        
+        # --- Export Section ---
+        st.divider()
+        st.subheader("📥 Export Options")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+    # Enhanced XLSX Export with ACTUAL Excel formulas
+            def create_excel_report():
+                import io
+                from openpyxl import Workbook
+                from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+                from openpyxl.worksheet.datavalidation import DataValidation
+                from openpyxl.styles import PatternFill, Font
 
+                black_fill = PatternFill(start_color="000000", end_color="000000", fill_type="solid")
+                white_font = Font(color="FFFFFF", bold=True)
+
+
+                
+                # Create a workbook and select the active sheet
+                wb = Workbook()
+                ws = wb.active
+                ws.title = "Solar Analysis Calculator"
+                
+                # Define styles
+                header_font = Font(bold=True, size=14, color="FFFFFF")
+                section_font = Font(bold=True, size=12, color="FFFFFF")
+                label_font = Font(bold=True, size=10)
+                value_font = Font(size=10)
+                input_font = Font(size=10, color="2E7D32", bold=True)  # Green for inputs
+                formula_font = Font(size=10, color="1976D2")  # Blue for formulas
+                
+                header_fill = PatternFill(start_color="2C3E50", end_color="2C3E50", fill_type="solid")
+                input_section_fill = PatternFill(start_color="E8F5E8", end_color="E8F5E8", fill_type="solid")
+                formula_section_fill = PatternFill(start_color="E3F2FD", end_color="E3F2FD", fill_type="solid")
+                output_section_fill = PatternFill(start_color="FFF3E0", end_color="FFF3E0", fill_type="solid")
+                
+                center_align = Alignment(horizontal='center', vertical='center')
+                left_align = Alignment(horizontal='left', vertical='center')
+                
+                thin_border = Border(left=Side(style='thin'), right=Side(style='thin'),
+                                top=Side(style='thin'), bottom=Side(style='thin'))
+                
+                # Title and Header
+                ws.merge_cells('A1:B1')
+                ws['A1'] = "SOLAR PRODUCTIVE USE CALCULATOR - INTERACTIVE"
+                ws['A1'].font = header_font
+                ws['A1'].fill = header_fill
+                ws['A1'].alignment = center_align
+                
+                ws.merge_cells('A2:B2')
+                ws['A2'] = "🔧 Change values in GREEN cells and watch formulas recalculate automatically"
+                ws['A2'].font = Font(italic=True, size=10, color="2E7D32")
+                ws['A2'].alignment = center_align
+                
+                # Start data from row 4
+                current_row = 4
+                
+                # SECTION 1: INPUT CELLS (Editable by users)
+                ws.merge_cells(f'A{current_row}:B{current_row}')
+                merged_range = ws[f'A{current_row}:B{current_row}']
+
+                # Apply text and style to the first (anchor) cell
+                cell = ws[f'A{current_row}']
+                cell.value = "📥 INPUT PARAMETERS (Change these values)"
+                cell.font = section_font
+                cell.alignment = center_align
+                cell.border = thin_border
+
+                # Apply fill and border to all cells in the merged range
+                for row in merged_range:
+                    for c in row:
+                        c.fill = input_section_fill
+                        c.fill = black_fill
+                        c.border = thin_border
+                # Create dropdown for System Type (AC/DC)
+                dv = DataValidation(type="list", formula1='"AC,DC"', allow_blank=False)
+                dv.error = "Please select either AC or DC"
+                dv.errorTitle = "Invalid Input"
+                dv.prompt = "Select the system type"
+                dv.promptTitle = "System Type"
+
+                # Add the validation to the worksheet
+                ws.add_data_validation(dv)
+                dv.add("B5")
+
+                # Optional: add label in column A
+                ws["A5"] = "System Type (Choose from Dropdown)"
+
+                current_row += 1
+                
+                # Define input cells with their current values
+                # These will be editable by users
+                input_cells = {
+                    "B6": ("Power Consumption (kW)", power),
+                    "B7": ("Processing Speed (kg/hour)", processing_speed),
+                    "B8": ("Appliance Price (USD)", price_usd),
+                    "B9": ("Daily Runtime (hours)", runtime_per_day),
+                    "B10": ("Operating Days per Year", operating_days),
+                    "B11": ("Income per kg (USD)", income_per_kg),
+                    "B12": ("Sun Hours per Day", sun_hours),
+                    "B13": ("System Efficiency (%)", system_efficiency),
+                    "B14": ("Battery Storage (hours)", battery_hours),
+                    "B15": ("Daily Operating Cost (USD)", daily_operating_cost),
+                    "B16": ("Loan Term (Years)", loan_term_years),
+                    "B17": ("Interest Rate (%)", interest_rate * 100),
+                    "B18": ("Deposit (%)", deposit_percentage),
+                    "B19": ("Import/Installation Cost Increase (%)", install_increase),
+                    "B20": ("Subsidy (%)", subsidy_percentage),
+                    "B21": ("Exchange Rate (USD to Local)", rate)
+                }
+                
+                # Add input labels
+                for cell_ref, (label, value) in input_cells.items():
+                    row = int(cell_ref[1:])
+                    ws[f'A{row}'] = label
+                    ws[f'A{row}'].font = label_font
+                    ws[f'A{row}'].alignment = left_align
+                    ws[f'A{row}'].border = thin_border
+                    
+                    # Input cells are editable and colored
+                    ws[cell_ref] = value
+                    ws[cell_ref].font = input_font
+                    ws[cell_ref].alignment = left_align
+                    ws[cell_ref].border = thin_border
+                    ws[cell_ref].fill = input_section_fill
+                
+                current_row = 22
+                
+                # SECTION 2: CALCULATIONS WITH ACTUAL EXCEL FORMULAS
+                ws.merge_cells(f'A{current_row}:B{current_row}')
+                ws[f'A{current_row}'] = "🧮 AUTOMATIC CALCULATIONS (These update automatically)"
+                ws[f'A{current_row}'].font = section_font
+                ws[f'A{current_row}'].fill = formula_section_fill
+                ws[f'A{current_row}'].alignment = center_align
+                ws[f'A{current_row}'].border = thin_border
+                ws[f'A{current_row}'].fill = black_fill
+                current_row += 1
+                
+                # Technical Calculations
+                tech_calculations = {
+                    f"A{current_row}": "Specific Efficiency (kg/kWh)",
+                    f"B{current_row}": "=B7/B6",  # Processing Speed / Power
+                    
+                    f"A{current_row+1}": "Daily Energy Required (kWh)",
+                    f"B{current_row+1}": "=B9*B6",  # Runtime * Power
+                    
+                    f"A{current_row+2}": "Energy Production Needed (kWh)",
+                    f"B{current_row+2}": "=B24/(B13/100)",  # Energy Required / Efficiency
+                    
+                    f"A{current_row+3}": "Daily Production (kg)",
+                    f"B{current_row+3}": "=B23*B24",  # Specific Efficiency * Energy Required
+                    
+                    f"A{current_row+4}": "Panel Energy per Day (kWh)",
+                    f"B{current_row+4}": "=0.5*B12",  # Panel Wattage * Sun Hours
+                    
+                    f"A{current_row+5}": "Panels Required",
+                    f"B{current_row+5}": "=ROUNDUP(B25 / (500 * B12 / 1000), 0)",  # CEILING(Energy Needed / Panel Energy)
+                    
+                    f"A{current_row+6}": "Recommended Solar Size (kWp)",
+                    f"B{current_row+6}": "=CEILING(B25/B12,0.5)",  # Custom rounding logic
+                    
+                    f"A{current_row+7}": "Battery Capacity (kWh)",
+                    f"B{current_row+7}": "=IFERROR((B29)*MAX(1,B14),"")",  # Solar Size * Battery Hours
+                }
+                
+                current_row += 8
+                
+                # Cost Calculations
+                cost_calculations = {
+                    f"A{current_row}": "Solar Panel Cost (USD)",
+                    f"B{current_row}": "=CEILING((B29*1000)/500,1)*50",  # Panels * $50 per panel
+                    
+                    f"A{current_row+1}": "Battery Cost (USD)",
+                    f"B{current_row+1}": "=B30*300",  # Battery Capacity * $300/kWh
+                    
+                    f"A{current_row+2}": "Inverter/Controller Cost (USD)",
+                    f"B{current_row+2}": '=IF(B5="AC",B29*100,B29*50)',  # Assuming AC system
+                    
+                    f"A{current_row+3}": "FOB Subtotal (USD)",
+                    f"B{current_row+3}": "=B8+B31+B32+B33",  # Machine + Solar + Battery + Inverter
+                    
+                    f"A{current_row+4}": "Import & Installation Cost (USD)",
+                    f"B{current_row+4}": "100%",  # FOB * Import %
+                    
+                    f"A{current_row+5}": "Total Installed Cost (USD)",
+                    f"B{current_row+5}": "=B34*(1+B35)",  # FOB + Import
+                    
+                    f"A{current_row+6}": "Subsidy Amount (USD)",
+                    f"B{current_row+6}": "=B36*(B20/100)",  # Total Cost * Subsidy %
+                    
+                    f"A{current_row+7}": "Total After Subsidy (USD)",
+                    f"B{current_row+7}": "=B36-B37",  # Total - Subsidy
+                    
+                    f"A{current_row+8}": "Deposit Amount (USD)",
+                    f"B{current_row+8}": "=B38*(B18/100)",  # After Subsidy * Deposit %
+                    
+                    f"A{current_row+9}": "Loan Principal (USD)",
+                    f"B{current_row+9}": "=B38-B39",  # After Subsidy - Deposit
+                }
+                
+                current_row += 10
+                
+                # Income & Loan Calculations
+                income_calculations = {
+                    f"A{current_row}": "Daily Gross Income (USD)",
+                    f"B{current_row}": "=B11*B26*B21",  # Income per kg * Daily Production
+                    
+                    f"A{current_row+1}": "Daily Net Income (USD)",
+                    f"B{current_row+1}": "=(B41/B21-B15)*B21",  # Gross Income - Operating Cost
+                    
+                    f"A{current_row+2}": "Annual Gross Profit (USD)",
+                    f"B{current_row+2}": "=B41*B10*B21",  # Daily Gross * Operating Days
+
+                    f"A{current_row+2}": "Annual Net Profit (USD)",
+                    f"B{current_row+2}": "=B42*B10*B21",  # Daily Net * Operating Days
+                    
+                    f"A{current_row+3}": "Monthly Interest Rate",
+                    f"B{current_row+3}": "=B17/12/100",  # Annual Rate / 12 months
+                    
+                    f"A{current_row+4}": "Monthly Repayment (USD)",
+                    f"B{current_row+4}": "=(B40*B44)/(1-(1+B44)^(-B16*12))",  # Loan payment formula
+                    
+                    f"A{current_row+5}": "Annual Repayment (USD)",
+                    f"B{current_row+5}": "=B45*12",  # Monthly * 12
+                    
+                    f"A{current_row+6}": "Daily Repayment (USD)",
+                    f"B{current_row+6}": "=B46/365",  # Annual / 365
+                    
+                    f"A{current_row+7}": "Total Repayment Amount (USD)",
+                    f"B{current_row+7}": "=B45*B16*12",  # Monthly * Months
+                    
+                    f"A{current_row+8}": "Total Interest Paid (USD)",
+                    f"B{current_row+8}": "=B48-B40",  # Total Repayment - Principal
+                    
+                    f"A{current_row+9}": "Payback Period (Years)",
+                    f"B{current_row+9}": "=IF(B61>0, B38/B43, \"N/A\")",  # Investment / Annual Profit
+
+                    f"A{current_row+10}": "Current Business Viability",
+                    f"B{current_row+10}": '=IF(OR(B42="",B47=""),"",IF(B42>=B47,"Yes ✅","No ❌"))',
+
+                    
+                }
+                
+                # Apply all formulas to the worksheet
+                all_calculations = {**tech_calculations, **cost_calculations, **income_calculations}
+                
+                for cell_ref, value in all_calculations.items():
+                    if cell_ref.startswith('A'):
+                        # This is a label
+                        ws[cell_ref] = value
+                        ws[cell_ref].font = label_font
+                        ws[cell_ref].alignment = left_align
+                        ws[cell_ref].border = thin_border
+                    else:
+                        # This is a formula or value
+                        if isinstance(value, str) and value.startswith('='):
+                            # It's a formula
+                            ws[cell_ref] = value
+                            ws[cell_ref].font = formula_font
+                        else:
+                            # It's a value
+                            ws[cell_ref] = value
+                            ws[cell_ref].font = value_font
+                        
+                        ws[cell_ref].alignment = left_align
+                        ws[cell_ref].border = thin_border
+                        ws[cell_ref].fill = formula_section_fill
+                
+                # Final row for current results display
+                current_row += 15
+                ws.merge_cells(f'A{current_row}:B{current_row}')
+                ws[f'A{current_row}'] = "💡 Prefilled Results Based on Your Inputs through Online Calculator"
+                ws[f'A{current_row}'].font = Font(bold=True, size=11, color="2C3E50")
+                ws[f'A{current_row}'].alignment = center_align
+                current_row += 1
+                
+                # Display current calculated values
+                current_results = {
+                    f"A{current_row}": "Machine Name",
+                    f"B{current_row}": f"{selected_appliance}",
+
+                    f"A{current_row+1}": "System Rating",
+                    f"B{current_row+1}": f"{selected_system}",
+
+                    f"A{current_row+2}": "Current Solar System Size",
+                    f"B{current_row+2}": f"{recommended_solar_size} kWp",
+                    
+                    f"A{current_row+3}": "Current Daily Net Income",
+                    f"B{current_row+3}": f"{selected_currency} {round(net_income_per_day * rate, 1)}",
+                    
+                    f"A{current_row+4}": "Current Total Investment", 
+                    f"B{current_row+4}": f"{selected_currency} {round(total_after_subsidy * rate, 1)}",
+                    
+                    f"A{current_row+5}": "Current Payback Period",
+                    f"B{current_row+5}": f"{round(payback_years_new, 1)} years" if viable_business else "N/A",
+                    
+                    f"A{current_row+6}": "Current Business Viability",
+                    f"B{current_row+6}": viability_text,
+                }
+                
+                for cell_ref, value in current_results.items():
+                    ws[cell_ref] = value
+                    if cell_ref.startswith('A'):
+                        ws[cell_ref].font = label_font
+                    else:
+                        ws[cell_ref].font = value_font
+                    ws[cell_ref].alignment = left_align
+                    ws[cell_ref].border = thin_border
+                
+                # Set column widths
+                ws.column_dimensions['A'].width = 35
+                ws.column_dimensions['B'].width = 25
+                
+                # Save to bytes
+                excel_buffer = io.BytesIO()
+                wb.save(excel_buffer)
+                excel_buffer.seek(0)
+                
+                return excel_buffer.getvalue()
+            
+            # Create dropdown for export format
+            export_format = st.selectbox(
+                "Choose Export Format:",
+                ["Select format", "Excel (.xlsx) - Interactive Calculator", "CSV (.csv) - Simple Report"],
+                key="export_format"
+            )
+            
+            def create_simple_csv():
+                """Create a simple CSV version"""
+                csv_data = []
+                csv_data.append("SOLAR PRODUCTIVE USE CALCULATOR REPORT")
+                csv_data.append(f"Generated: {report_data['Date']}")
+                csv_data.append(f"Currency: {selected_currency}")
+                csv_data.append("")
+                
+                # Inputs
+                csv_data.append("INPUT PARAMETERS")
+                csv_data.append("Parameter,Value")
+                input_params = {
+                    "Appliance": selected_appliance,
+                    "System Type": selected_system,
+                    "Power (kW)": power,
+                    "Processing Speed (kg/hr)": processing_speed,
+                    "Daily Runtime (hrs)": runtime_per_day,
+                    "Operating Days/Year": operating_days,
+                    "Sun Hours/Day": sun_hours,
+                    "System Efficiency (%)": system_efficiency,
+                    "Income per kg": f"{selected_currency} {round(income_per_kg * rate, 3)}",
+                    "Daily Operating Cost": f"{selected_currency} {round(daily_operating_cost * rate, 1)}"
+                }
+                
+                for key, value in input_params.items():
+                    csv_data.append(f"{key},{value}")
+                
+                csv_data.append("")
+                
+                # Results
+                csv_data.append("CALCULATED RESULTS")
+                csv_data.append("Parameter,Value")
+                results = {
+                    "Solar System Size": f"{recommended_solar_size} kWp",
+                    "Panels Required": f"{panels_required}",
+                    "Daily Production": f"{round(production_per_day, 1)} kg",
+                    "Daily Net Income": f"{selected_currency} {round(net_income_per_day * rate, 1)}",
+                    "Total Investment": f"{selected_currency} {round(total_after_subsidy * rate, 1)}",
+                    "Payback Period": f"{round(payback_years_new, 1)} years" if viable_business else "N/A",
+                    "Business Viable": viability_text
+                }
+                
+                for key, value in results.items():
+                    csv_data.append(f"{key},{value}")
+                
+                return "\n".join(csv_data)
+            
+            # Download button based on selection
+            if export_format == "Excel (.xlsx) - Interactive Calculator":
+                if st.button("📊 Generate Interactive Excel", use_container_width=True):
+                    with st.spinner("Creating interactive Excel calculator..."):
+                        try:
+                            excel_data = create_excel_report()
+                            st.download_button(
+                                label="📥 Download Interactive Excel (.xlsx)",
+                                data=excel_data,
+                                file_name=f"solar_calculator_interactive_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx",
+                                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                use_container_width=True,
+                                help="Change GREEN input cells and watch formulas recalculate automatically!"
+                            )
+                        except Exception as e:
+                            st.error(f"Error generating Excel report: {e}")
+                            st.info("Make sure you have openpyxl installed: pip install openpyxl")
+            
+            elif export_format == "CSV (.csv) - Simple Report":
+                if st.button("📄 Generate CSV Report", use_container_width=True):
+                    with st.spinner("Generating CSV report..."):
+                        try:
+                            csv_data = create_simple_csv()
+                            st.download_button(
+                                label="📥 Download CSV Report (.csv)",
+                                data=csv_data,
+                                file_name=f"solar_calculator_report_{datetime.now().strftime('%Y%m%d_%H%M')}.csv",
+                                mime="text/csv",
+                                use_container_width=True,
+                                help="Simple CSV format for quick viewing"
+                            )
+                        except Exception as e:
+                            st.error(f"Error generating CSV report: {e}")
+
+        with col2:
+            # Enhanced PDF Export with table format
+            from reportlab.lib.pagesizes import letter
+            from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
+            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+            from reportlab.lib.enums import TA_CENTER, TA_LEFT
+            from reportlab.lib import colors
+            import tempfile
+            import requests
+            from io import BytesIO
+            
+            def create_comprehensive_pdf():
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+                    pdf_path = tmp.name
+                
+                doc = SimpleDocTemplate(pdf_path, pagesize=letter)
+                styles = getSampleStyleSheet()
+                
+                # Custom styles
+                title_style = ParagraphStyle("TitleCenter", parent=styles["Title"], alignment=TA_CENTER, fontSize=16, spaceAfter=20)
+                section_style = ParagraphStyle("Section", parent=styles["Heading2"], fontSize=12, spaceAfter=12, textColor=colors.HexColor("#2c3e50"))
+                normal_style = ParagraphStyle("Normal", parent=styles["Normal"], alignment=TA_LEFT, leading=12)
+                
+                story = []
+                
+                # Title and Header
+                story.append(Paragraph("SOLAR PRODUCTIVE USE CALCULATOR", title_style))
+                story.append(Paragraph("COMPREHENSIVE ANALYSIS REPORT", title_style))
+                story.append(Spacer(1, 10))
+                story.append(Paragraph(f"Generated on: {report_data['Date']}", styles["Italic"]))
+                story.append(Spacer(1, 20))
+                
+                # Appliance Image
+                appliance_images = {
+                    "Hammer Mill for Flour": "https://productivesolarsolutions.com/uploads/products/MaizeMill.png",
+                    "Rice Huller/Polisher": "https://productivesolarsolutions.com/uploads/products/RiceMill-MaizeHuller.png"
+                }
+                
+                if selected_appliance in appliance_images:
+                    try:
+                        response = requests.get(appliance_images[selected_appliance])
+                        img_data = BytesIO(response.content)
+                        img = Image(img_data, width=180, height=135)
+                        img.hAlign = 'CENTER'
+                        story.append(img)
+                        story.append(Spacer(1, 8))
+                        story.append(Paragraph(f"<i>{selected_appliance}</i>", styles["Italic"]))
+                        story.append(Spacer(1, 20))
+                    except:
+                        pass
+                
+                # Key Performance Indicators Table
+                story.append(Paragraph("KEY PERFORMANCE INDICATORS", section_style))
+                
+                kpi_data = [
+                    ["DAILY NET INCOME", report_data["Daily Net Income"]],
+                    ["TOTAL INVESTMENT", report_data["Total After Subsidy"]],
+                    ["PAYBACK PERIOD", report_data["Payback Period"]],
+                    ["BUSINESS VIABILITY", report_data["Business Viable"]],
+                    ["SOLAR SYSTEM SIZE", report_data["Recommended Solar Size"]],
+                    ["DAILY PRODUCTION", report_data["Daily Production"]]
+                ]
+                
+                kpi_table = Table(kpi_data, colWidths=[200, 200])
+                kpi_table.setStyle(TableStyle([
+                    ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor("#f8f9fa")),
+                    ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                    ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
+                    ('FONTSIZE', (0, 0), (-1, -1), 10),
+                    ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#4CAF50")),
+                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+                ]))
+                story.append(kpi_table)
+                story.append(Spacer(1, 25))
+                
+                # Input Parameters Table
+                story.append(Paragraph("INPUT PARAMETERS", section_style))
+                
+                input_data = [
+                    ["Parameter", "Value"],
+                    ["Appliance", report_data["Appliance"]],
+                    ["System Type", report_data["System Type"]],
+                    ["Power Consumption", report_data["Power Consumption"]],
+                    ["Processing Speed", report_data["Processing Speed"]],
+                    ["Appliance Price", report_data["Appliance Price"]],
+                    ["Daily Runtime", report_data["Daily Runtime"]],
+                    ["Operating Days/Year", report_data["Operating Days/Year"]],
+                    ["Sun Hours/Day", report_data["Sun Hours/Day"]],
+                    ["System Efficiency", report_data["System Efficiency"]],
+                    ["Battery Storage", report_data["Battery Storage"]],
+                    ["Income per kg", report_data["Income per kg"]],
+                    ["Daily Operating Cost", report_data["Daily Operating Cost"]],
+                    ["Loan Term", report_data["Loan Term"]],
+                    ["Interest Rate", report_data["Interest Rate"]],
+                    ["Deposit Percentage", report_data["Deposit Percentage"]],
+                    ["Import/Installation Cost Increase", report_data["Import/Installation Cost Increase"]],
+                    ["Subsidy Percentage", report_data["Subsidy Percentage"]]
+                ]
+                
+                input_table = Table(input_data, colWidths=[220, 220])
+                input_table.setStyle(TableStyle([
+                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#2c3e50")),
+                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+                    ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                    ('FONTSIZE', (0, 0), (-1, -1), 9),
+                    ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+                    ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor("#ffffff")),
+                ]))
+                story.append(input_table)
+                story.append(Spacer(1, 25))
+                
+                # Technical Specifications Table
+                story.append(Paragraph("TECHNICAL SPECIFICATIONS", section_style))
+                
+                tech_data = [
+                    ["Parameter", "Value"],
+                    ["Recommended Solar Size", report_data["Recommended Solar Size"]],
+                    ["Panels Required", report_data["Panels Required"]],
+                    ["Battery Capacity", report_data["Battery Capacity"]],
+                    ["Daily Energy Required", report_data["Daily Energy Required"]],
+                    ["Daily Energy Production", report_data["Daily Energy Production"]],
+                    ["Specific Efficiency", report_data["Specific Efficiency"]],
+                    ["Daily Production", report_data["Daily Production"]]
+                ]
+                
+                tech_table = Table(tech_data, colWidths=[220, 220])
+                tech_table.setStyle(TableStyle([
+                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#3498db")),
+                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+                    ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                    ('FONTSIZE', (0, 0), (-1, -1), 9),
+                    ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+                    ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor("#f0f8ff")),
+                ]))
+                story.append(tech_table)
+                story.append(Spacer(1, 25))
+                
+                # Financial Analysis Table
+                story.append(Paragraph("FINANCIAL ANALYSIS", section_style))
+                
+                financial_data = [
+                    ["Parameter", "Value"],
+                    ["Daily Gross Income", report_data["Daily Gross Income"]],
+                    ["Daily Net Income", report_data["Daily Net Income"]],
+                    ["Annual Gross Income", report_data["Annual Gross Income"]],
+                    ["Annual Net Profit", report_data["Annual Net Profit"]],
+                    ["Machine Cost", report_data["Machine Cost"]],
+                    ["Solar Panel Cost", report_data["Solar Panel Cost"]],
+                    ["Battery Cost", report_data["Battery Cost"]],
+                    ["Inverter/Controller Cost", report_data["Inverter/Controller Cost"]],
+                    ["Import & Installation Cost", report_data["Import & Installation Cost"]],
+                    ["FOB Subtotal", report_data["FOB Subtotal"]],
+                    ["Total Installed Cost", report_data["Total Installed Cost"]],
+                    ["Subsidy Amount", report_data["Subsidy Amount"]],
+                    ["Total After Subsidy", report_data["Total After Subsidy"]],
+                    ["Deposit Amount", report_data["Deposit Amount"]],
+                    ["Loan Amount", report_data["Loan Amount"]]
+                ]
+                
+                financial_table = Table(financial_data, colWidths=[220, 220])
+                financial_table.setStyle(TableStyle([
+                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#27ae60")),
+                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+                    ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                    ('FONTSIZE', (0, 0), (-1, -1), 9),
+                    ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+                    ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor("#f0fff4")),
+                ]))
+                story.append(financial_table)
+                story.append(Spacer(1, 25))
+                
+                # Loan Analysis Table
+                story.append(Paragraph("LOAN ANALYSIS", section_style))
+                
+                loan_data = [
+                    ["Parameter", "Value"],
+                    ["Monthly Repayment", report_data["Monthly Repayment"]],
+                    ["Annual Repayment", report_data["Annual Repayment"]],
+                    ["Daily Repayment", report_data["Daily Repayment"]],
+                    ["Total Interest Paid", report_data["Total Interest Paid"]],
+                    ["Total Repayment Amount", report_data["Total Repayment Amount"]],
+                    ["Repayment % of Gross Revenue", report_data["Repayment % of Gross Revenue"]],
+                    ["Repayment % of Net Revenue", report_data["Repayment % of Net Revenue"]],
+                    ["Payback Period", report_data["Payback Period"]],
+                    ["Business Viable", report_data["Business Viable"]],
+                    ["Daily Surplus", report_data["Daily Surplus"]]
+                ]
+                
+                loan_table = Table(loan_data, colWidths=[220, 220])
+                loan_table.setStyle(TableStyle([
+                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#e74c3c")),
+                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+                    ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                    ('FONTSIZE', (0, 0), (-1, -1), 9),
+                    ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+                    ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor("#fff5f5")),
+                ]))
+                story.append(loan_table)
+                story.append(Spacer(1, 20))
+                
+                # Footer
+                story.append(Paragraph("--- End of Report ---", styles["Italic"]))
+                story.append(Spacer(1, 10))
+                story.append(Paragraph(f"Currency: {selected_currency} | Exchange Rate: 1 USD = {rate:.2f} {selected_currency}", styles["Italic"]))
+                
+                # Build PDF
+                doc.build(story)
+                
+                with open(pdf_path, 'rb') as f:
+                    return f.read()
+            
+            if st.button("📄 Generate Comprehensive PDF Report", use_container_width=True):
+                with st.spinner("Generating detailed PDF report..."):
+                    try:
+                        pdf_bytes = create_comprehensive_pdf()
+                        st.download_button(
+                            label="📥 Download PDF Report",
+                            data=pdf_bytes,
+                            file_name=f"solar_calculator_comprehensive_report_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf",
+                            mime="application/pdf",
+                            use_container_width=True
+                        )
+                    except Exception as e:
+                        st.error(f"Error generating PDF: {e}")
+                        st.info("Make sure you have reportlab installed: pip install reportlab")
+
+    
 if st.sidebar.checkbox("📦 Manage Appliances"):
     st.sidebar.markdown("---")
     st.sidebar.subheader("➕ Add or Edit Appliances")
